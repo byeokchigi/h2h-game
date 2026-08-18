@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hearts2Hearts — Memory Puzzle</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,sans-serif;background:linear-gradient(135deg,#ffe5f1,#e8e0ff);display:flex;justify-content:center;align-items:center;color:#3d2940}
+.game{width:min(920px,94vw);padding:24px}.top{text-align:center}.top h1{margin:0;font-size:clamp(30px,6vw,52px);background:linear-gradient(90deg,#ec5d9c,#8064e8);color:transparent;background-clip:text}.top p{margin:5px 0 16px}
+.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.stat{background:#ffffffb8;padding:9px 15px;border-radius:999px;font-weight:800;box-shadow:0 4px 14px #7d477522}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:680px;margin:auto}
+.card{height:145px;border:0;background:none;padding:0;perspective:700px;cursor:pointer}.inner{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}.card.flipped .inner,.card.matched .inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;border-radius:18px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;box-shadow:0 7px 18px #6b426530;border:2px solid #fff}
+.back{background:linear-gradient(135deg,#d96ba8,#8874e8);color:white;font-size:34px}.front{transform:rotateY(180deg);background:#fff8fb;flex-direction:column;gap:5px}.symbol{font-size:35px}.name{font-size:16px;font-weight:900}.matched .front{box-shadow:0 0 0 3px #7bd8ad,0 7px 18px #6b426530}
+button#restart{display:block;margin:20px auto 0;border:0;padding:11px 22px;border-radius:999px;background:#49364f;color:#fff;font-weight:800;cursor:pointer}
+@media(max-width:600px){.board{gap:8px}.card{height:110px}.name{font-size:12px}.symbol{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="top">
+    <h1>Hearts2Hearts 💗</h1>
+    <p>Memory Puzzle — match every pair!</p>
+  </div>
+  <div class="stats">
+    <div class="stat">Moves: <span id="moves">0</span></div>
+    <div class="stat">Pairs: <span id="pairs">0</span>/8</div>
+    <div class="stat">Time: <span id="time">0</span>s</div>
+  </div>
+  <div id="board" class="board"></div>
+  <button id="restart">Restart Puzzle</button>
+</div>
+<script>
+const members=["Carmen","Jiwoo","Yuha","Stella","Juun","A-na","Ian","Ye-on"];
+const icons=["🌴","🍓","🎀","🧁","👾","🌻","🫛","😊"];
+let deck=[],first=null,second=null,lock=false,moves=0,pairs=0,time=0,timer;
+const board=document.getElementById("board");
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(){
+ clearInterval(timer);moves=0;pairs=0;time=0;first=second=null;lock=false;
+ document.getElementById("moves").textContent=0;document.getElementById("pairs").textContent=0;document.getElementById("time").textContent=0;
+ deck=shuffle(members.flatMap((name,i)=>[{name,i},{name,i}]));
+ board.innerHTML="";
+ deck.forEach((card,index)=>{
+   const b=document.createElement("button");b.className="card";b.dataset.name=card.name;
+   b.innerHTML=`<div class="inner"><div class="face back">♥</div><div class="face front"><div class="symbol">${icons[card.i]}</div><div class="name">${card.name}</div></div></div>`;
+   b.onclick=()=>flip(b);board.appendChild(b);
+ });
+ timer=setInterval(()=>{time++;document.getElementById("time").textContent=time},1000);
+}
+function flip(card){
+ if(lock||card.classList.contains("flipped")||card.classList.contains("matched"))return;
+ card.classList.add("flipped");
+ if(!first){first=card;return}
+ second=card;moves++;document.getElementById("moves").textContent=moves;
+ if(first.dataset.name===second.dataset.name){
+   first.classList.add("matched");second.classList.add("matched");pairs++;
+   document.getElementById("pairs").textContent=pairs;first=second=null;
+   if(pairs===8){clearInterval(timer);setTimeout(()=>alert(`Puzzle complete! 💗\\n${moves} moves in ${time} seconds.`),250)}
+ }else{
+   lock=true;setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first=second=null;lock=false},850);
+ }
+}
+document.getElementById("restart").onclick=start;start();
+</script>
+</body>
+</html>
