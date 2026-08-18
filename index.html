@@ -19,7 +19,7 @@ button#restart{display:block;margin:20px auto 0;border:0;padding:11px 22px;borde
 <div class="game">
   <div class="top">
     <h1>Hearts2Hearts 💗</h1>
-    <p>Memory Puzzle — match every pair!</p>
+    <p>Thea Adriene — bulok</p>
   </div>
   <div class="stats">
     <div class="stat">Moves: <span id="moves">0</span></div>
@@ -55,7 +55,7 @@ function flip(card){
  if(first.dataset.name===second.dataset.name){
    first.classList.add("matched");second.classList.add("matched");pairs++;
    document.getElementById("pairs").textContent=pairs;first=second=null;
-   if(pairs===8){clearInterval(timer);setTimeout(()=>alert(`Puzzle complete! 💗\\n${moves} moves in ${time} seconds.`),250)}
+   if(pairs===8){clearInterval(timer);setTimeout(()=>alert(`Puzzle complete! 💗 \n ${moves} moves in ${time} seconds.`),250)}
  }else{
    lock=true;setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first=second=null;lock=false},850);
  }
