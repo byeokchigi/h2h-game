@@ -1,1 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
 
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Hearts2Hearts — Heart Rush</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,sans-serif;
+  color:white;
+  overflow:hidden;
+
+  background:
+    radial-gradient(circle at 50% 10%,#ff8bd855,transparent 35%),
+    linear-gradient(135deg,#160a25,#451047);
+}
+
+.game{
+  width:min(900px,100vw);
+  margin:auto;
+  padding:12px;
+  text-align:center;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(30px,7vw,55px);
+
+  background:linear-gradient(
+    90deg,
+    #ff65b5,
+    #ffffff,
+    #8b7cff
+  );
+
+  color:transparent;
+  background-clip:text;
+}
+
+.subtitle{
+  margin:0 0 8px;
+  font-weight:800;
+  letter-spacing:3px;
+}
+
+.stats{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-bottom:8px;
+}
+
+.stat{
+  padding:7px 13px;
+  border-radius:999px;
+  background:#ffffff18;
+  border:1px solid #ffffff30;
+  font-weight:900;
+}
+
+#gameArea{
+  position:relative;
+  width:100%;
+  height:min(72vh,650px);
+  min-height:430px;
+
+  overflow:hidden;
+
+  border-radius:25px;
+  border:2px solid #ffffff45;
+
+  background:
+    radial-gradient(circle at 50% 40%,#9b4ca044,transparent 45%),
+    linear-gradient(#170927cc,#0c0717);
+
+  box-shadow:
+    0 0 35px #ff4fa833,
+    inset 0 0 50px #0008;
+}
+
+/* SPEED LINES */
+
+.speedLine{
+  position:absolute;
+  width:2px;
+  height:60px;
+  background:#ffffff55;
+  animation:fall linear infinite;
+}
+
+@keyframes fall{
+  from{
+    transform:translateY(-100px);
+  }
+
+  to{
+    transform:translateY(750px);
+  }
+}
+
+/* TARGET */
+
+#target{
+  position:absolute;
+
+  width:115px;
+  height:115px;
+
+  border-radius:50%;
+
+  left:50%;
+  top:50%;
+
+  transform:translate(-50%,-50%);
+
+  border:5px solid white;
+
+  box-shadow:
+    0 0 15px #ff75c9,
+    0 0 35px #ff75c966;
+
+  object-fit:cover;
+
+  background:white;
+
+  transition:
+    left .12s,
+    top .12s,
+    transform .12s;
+}
+
+#target.pulse{
+  animation:pulse .25s;
+}
+
+@keyframes pulse{
+
+  50%{
+    transform:
+      translate(-50%,-50%)
+      scale(1.25);
+  }
+
+}
+
+/* HIT TEXT */
+
+#hitText{
+  position:absolute;
+
+  left:50%;
+  top:45%;
+
+  transform:translate(-50%,-50%);
+
+  font-size:42px;
+  font-weight:1000;
+
+  pointer-events:none;
+
+  opacity:0;
+}
+
+#hitText.show{
+  animation:hit .5s forwards;
+}
+
+@keyframes hit{
+
+  0%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(.5);
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-110%)
+      scale(1.4);
+  }
+
+}
+
+/* FEVER */
+
+#fever{
+  position:absolute;
+
+  top:10px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  padding:8px 20px;
+
+  border-radius:999px;
+
+  background:#ff4fa9;
+
+  font-weight:1000;
+
+  letter-spacing:2px;
+
+  display:none;
+
+  box-shadow:
+    0 0 20px #ff4fa9,
+    0 0 40px #ff4fa977;
+
+  z-index:10;
+}
+
+#fever.active{
+  display:block;
+  animation:feverPulse .25s infinite alternate;
+}
+
+@keyframes feverPulse{
+
+  to{
+    transform:
+      translateX(-50%)
+      scale(1.08);
+  }
+
+}
+
+/* START SCREEN */
+
+#overlay{
+  position:absolute;
+
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#0b0615dd;
+
+  z-index:20;
+}
+
+.overlayBox{
+  padding:30px;
+ 
