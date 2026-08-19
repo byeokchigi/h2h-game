@@ -484,7 +484,7 @@ START RUSH
 /* ==================================
    MEMBERS
 ================================== */
-
+  
 const members=[
   "Carmen",
   "Jiwoo",
@@ -513,6 +513,11 @@ const pictures=[
    ELEMENTS
 ================================== */
 
+const bgMusic = new Audio("Iconic.mp3");
+
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
+  
 const gameArea=
 document.getElementById("gameArea");
 
@@ -645,6 +650,12 @@ function startGame(){
   timeLimit=1300;
 
   running=true;
+
+  bgMusic.currentTime = 0;
+
+bgMusic.play().catch(() => {
+  console.log("Music requires user interaction.");
+});
 
   fever.classList.remove("active");
 
