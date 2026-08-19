@@ -4,37 +4,544 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Hearts2Hearts — Memory Puzzle</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,sans-serif;background:linear-gradient(135deg,#ffe5f1,#e8e0ff);display:flex;justify-content:center;align-items:center;color:#3d2940}
-.game{width:min(920px,94vw);padding:24px}.top{text-align:center}.top h1{margin:0;font-size:clamp(30px,6vw,52px);background:linear-gradient(90deg,#ec5d9c,#8064e8);color:transparent;background-clip:text}.top p{margin:5px 0 16px}
-.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.stat{background:#ffffffb8;padding:9px 15px;border-radius:999px;font-weight:800;box-shadow:0 4px 14px #7d477522}
-.board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:680px;margin:auto}
-.card{height:145px;border:0;background:none;padding:0;perspective:700px;cursor:pointer}.inner{position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}.card.flipped .inner,.card.matched .inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;border-radius:18px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;box-shadow:0 7px 18px #6b426530;border:2px solid #fff}
-.back{background:linear-gradient(135deg,#d96ba8,#8874e8);color:white;font-size:34px}.front{transform:rotateY(180deg);background:#fff8fb;flex-direction:column;gap:5px}.symbol{font-size:35px}.name{font-size:16px;font-weight:900}.matched .front{box-shadow:0 0 0 3px #7bd8ad,0 7px 18px #6b426530}
-button#restart{display:block;margin:20px auto 0;border:0;padding:11px 22px;border-radius:999px;background:#49364f;color:#fff;font-weight:800;cursor:pointer}
-@media(max-width:600px){.board{gap:8px}.card{height:110px}.name{font-size:12px}.symbol{font-size:28px}}
+*{box-sizing:border-box}
 
-html, body {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:system-ui,sans-serif;
+  background:linear-gradient(135deg,#ffe5f1,#e8e0ff);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#3d2940
 }
-.game-board {
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-
-    box-sizing: border-box;
+.game{
+  width:min(920px,94vw);
+  padding:24px
 }
-.card {
-    width: 100%;
-    aspect-ratio: 3 / 4;
+
+.top{text-align:center}
+
+.top h1{
+  margin:0;
+  font-size:clamp(30px,6vw,52px);
+  background:linear-gradient(90deg,#ec5d9c,#8064e8);
+  color:transparent;
+  background-clip:text
+}
+
+.top p{
+  margin:5px 0 16px
+}
+
+.stats{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px
+}
+
+.stat{
+  background:#ffffffb8;
+  padding:9px 15px;
+  border-radius:999px;
+  font-weight:800;
+  box-shadow:0 4px 14px #7d477522
+}
+
+.board{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  max-width:680px;
+  margin:auto
+}
+
+.card{
+  height:145px;
+  border:0;
+  background:none;
+  padding:0;
+  perspective:700px;
+  cursor:pointer
+}
+
+.inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform .45s;
+  transform-style:preserve-3d
+}
+
+.card.flipped .inner,
+.card.matched .inner{
+  transform:rotateY(180deg)
+}
+
+.face{
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+  box-shadow:0 7px 18px #6b426530;
+  border:2px solid #fff;
+  overflow:hidden
+}
+
+/* CARD FRONT - what you see before flipping */
+.face.front{
+  background:linear-gradient(135deg,#d96ba8,#8874e8);
+  color:white;
+  font-size:34px;
+  transform:rotateY(0deg)
+}
+
+/* CARD BACK - member picture */
+.face.back{
+  transform:rotateY(180deg);
+  background:#fff8fb
+}
+
+.face.back img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block
+}
+
+.matched .back{
+  box-shadow:0 0 0 3px #7bd8ad,0 7px 18px #6b426530
+}
+
+button#restart{
+  display:block;
+  margin:20px auto 0;
+  border:0;
+  padding:11px 22px;
+  border-radius:999px;
+  background:#49364f;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer
+}
+
+html,body{
+  width:100%;
+  max-width:100%;
+  margin:0;
+  padding:0;
+  overflow-x:hidden
+}
+
+@media(max-width:600px){
+  .board{gap:8px}
+  .card{height:110px}
+}
+
+/* HIGH SCORE */
+.high-score{
+  background:linear-gradient(135deg,#fff0a8,#ffd1eb);
+  color:#59324f;
+  box-shadow:0 4px 16px #7d477533
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <div class="top">
+    <h1>Hearts2Hearts 🩵</h1>
+    <p>Memory Game</p>
+  </div>
+
+  <div class="stats">
+
+    <div class="stat">
+      Moves: <span id="moves">0</span>
+    </div>
+
+    <div class="stat">
+      Pairs: <span id="pairs">0</span>/8
+    </div>
+
+    <div class="stat">
+      Time: <span id="time">0</span>s
+    </div>
+
+    <div class="stat high-score">
+      🏆 Best: <span id="highScore">-</span> moves
+    </div>
+
+  </div>
+
+  <div id="board" class="board"></div>
+
+  <button id="restart">
+    Restart Puzzle
+  </button>
+
+</div>
+
+<script>
+
+const members=[
+  "Carmen",
+  "Jiwoo",
+  "Yuha",
+  "Stella",
+  "Juun",
+  "A-na",
+  "Ian",
+  "Ye-on"
+];
+
+const icons=[
+  "Carmen.jpg",
+  "Jiwoo.jpg",
+  "Yuha.jpg",
+  "Stella.jpg",
+  "Juun.jpg",
+  "A-na.jpg",
+  "Ian.jpg",
+  "Ye-on.jpg"
+];
+
+
+/* =========================
+   HIGH SCORE
+========================= */
+
+let highScore=localStorage.getItem("h2hHighScore");
+
+function showHighScore(){
+
+  document.getElementById("highScore").textContent =
+    highScore === null ? "-" : highScore;
+
+}
+
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let deck=[],
+    first=null,
+    second=null,
+    lock=false,
+    moves=0,
+    pairs=0,
+    time=0,
+    timer;
+
+
+/* =========================
+   GAME SETUP
+========================= */
+
+const board=document.getElementById("board");
+
+const bgMusic=new Audio("Iconic.mp3");
+bgMusic.loop=true;
+bgMusic.volume=0.3;
+
+
+/* =========================
+   SHUFFLE
+========================= */
+
+function shuffle(a){
+
+  for(let i=a.length-1;i>0;i--){
+
+    let j=Math.floor(Math.random()*(i+1));
+
+    [a[i],a[j]]=[a[j],a[i]];
+
+  }
+
+  return a;
+
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+function start(){
+
+  clearInterval(timer);
+
+  moves=0;
+  pairs=0;
+  time=0;
+
+  first=null;
+  second=null;
+  lock=false;
+
+  document.getElementById("moves").textContent=0;
+  document.getElementById("pairs").textContent=0;
+  document.getElementById("time").textContent=0;
+
+  showHighScore();
+
+
+  /* CREATE TWO CARDS FOR EACH MEMBER */
+
+  deck=shuffle(
+    members.flatMap((name,i)=>[
+      {name,i},
+      {name,i}
+    ])
+  );
+
+
+  /* PLAY MUSIC */
+
+  bgMusic.play().catch(error=>{
+    console.log("Music waiting for user interaction");
+  });
+
+
+  board.innerHTML="";
+
+
+  /* CREATE CARDS */
+
+  deck.forEach((card,index)=>{
+
+    const b=document.createElement("button");
+
+    b.className="card";
+
+    b.dataset.name=card.name;
+
+
+    b.innerHTML=`
+
+      <div class="inner">
+
+        <div class="face front">
+          💗
+        </div>
+
+        <div class="face back">
+          <img
+            src="${icons[card.i]}"
+            alt="${card.name}"
+          >
+        </div>
+
+      </div>
+
+    `;
+
+
+    b.onclick=()=>flip(b);
+
+    board.appendChild(b);
+
+  });
+
+
+  /* TIMER */
+
+  timer=setInterval(()=>{
+
+    time++;
+
+    document.getElementById("time").textContent=time;
+
+  },1000);
+
+}
+
+
+/* =========================
+   FLIP CARD
+========================= */
+
+function flip(card){
+
+  if(
+    lock ||
+    card.classList.contains("flipped") ||
+    card.classList.contains("matched")
+  ){
+    return;
+  }
+
+
+  card.classList.add("flipped");
+
+
+  /* FIRST CARD */
+
+  if(!first){
+
+    first=card;
+
+    return;
+
+  }
+
+
+  /* SECOND CARD */
+
+  second=card;
+
+  moves++;
+
+  document.getElementById("moves").textContent=moves;
+
+
+  /* =========================
+     MATCH
+  ========================= */
+
+  if(first.dataset.name===second.dataset.name){
+
+    first.classList.add("matched");
+
+    second.classList.add("matched");
+
+    pairs++;
+
+    document.getElementById("pairs").textContent=pairs;
+
+    first=null;
+    second=null;
+
+
+    /* =========================
+       WIN
+    ========================= */
+
+    if(pairs===8){
+
+      clearInterval(timer);
+
+      bgMusic.pause();
+      bgMusic.currentTime=0;
+
+
+      /* CHECK HIGH SCORE */
+
+      let newRecord=false;
+
+      if(
+        highScore===null ||
+        moves < Number(highScore)
+      ){
+
+        highScore=moves;
+
+        localStorage.setItem(
+          "h2hHighScore",
+          highScore
+        );
+
+        newRecord=true;
+
+      }
+
+
+      showHighScore();
+
+
+      /* FINISH SOUND */
+
+      const finishSound=new Audio("cool.mp3");
+
+      finishSound.play();
+
+
+      finishSound.onended=()=>{
+
+        if(newRecord){
+
+          alert(
+            `🏆 NEW HIGH SCORE! 🏆\n\n`+
+            `Wow so cool 🩵\n`+
+            `${moves} moves in ${time} seconds!`
+          );
+
+        }else{
+
+          alert(
+            `Wow so cool 🩵\n\n`+
+            `${moves} moves in ${time} seconds.\n\n`+
+            `🏆 Best: ${highScore} moves`
+          );
+
+        }
+
+      };
+
+    }
+
+
+  }else{
+
+
+    /* =========================
+       NOT A MATCH
+    ========================= */
+
+    lock=true;
+
+    setTimeout(()=>{
+
+      first.classList.remove("flipped");
+
+      second.classList.remove("flipped");
+
+      first=null;
+
+      second=null;
+
+      lock=false;
+
+    },800);
+
+  }
+
+}
+
+
+/* =========================
+   RESTART
+========================= */
+
+document.getElementById("restart").onclick=start;
+
+
+/* =========================
+   START GAME
+========================= */
+
+showHighScore();
+
+start();
+
+</script>
+
+</body>
+</html>    aspect-ratio: 3 / 4;
     perspective: 1000px;
     box-sizing: border-box;
 }
