@@ -258,4 +258,727 @@ h1{
 
 .overlayBox{
   padding:30px;
- 
+  max-width:500px;
+}
+
+.overlayBox h2{
+  font-size:38px;
+  margin:0 0 10px;
+}
+
+.overlayBox p{
+  line-height:1.6;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+  color:white;
+  font-weight:900;
+}
+
+#start{
+  padding:14px 30px;
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ff4fa9,
+      #795cff
+    );
+
+  font-size:18px;
+
+  box-shadow:
+    0 0 20px #ff4fa955;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* CONTROLS */
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+
+  margin-top:8px;
+}
+
+.memberBtn{
+  width:62px;
+  height:62px;
+
+  padding:0;
+
+  border-radius:50%;
+
+  overflow:hidden;
+
+  border:3px solid #ffffff55;
+
+  background:#ffffff15;
+
+  transition:
+    transform .1s,
+    border .1s;
+}
+
+.memberBtn img{
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+}
+
+.memberBtn:active{
+  transform:scale(.88);
+  border-color:white;
+}
+
+@media(max-width:600px){
+
+  #gameArea{
+    height:64vh;
+    min-height:400px;
+  }
+
+  #target{
+    width:90px;
+    height:90px;
+  }
+
+  .memberBtn{
+    width:43px;
+    height:43px;
+    border-width:2px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<h1>Hearts2Hearts 💗</h1>
+
+<p class="subtitle">
+HEART RUSH ⚡
+</p>
+
+<div class="stats">
+
+<div class="stat">
+SCORE: <span id="score">0</span>
+</div>
+
+<div class="stat">
+COMBO: <span id="combo">0</span>
+</div>
+
+<div class="stat">
+BEST: <span id="best">0</span>
+</div>
+
+<div class="stat">
+❤️ <span id="lives">3</span>
+</div>
+
+</div>
+
+
+<div id="gameArea">
+
+<div id="fever">
+🔥 FEVER MODE 🔥
+</div>
+
+
+<div id="overlay">
+
+<div class="overlayBox">
+
+<h2>
+💗 HEART RUSH
+</h2>
+
+<p>
+Tap the correct member as fast as you can!
+<br><br>
+
+⚡ The game gets faster.
+<br>
+🔥 Build combos.
+<br>
+💔 Wrong answers cost a life.
+<br>
+🌟 Reach 20 combo for FEVER MODE!
+</p>
+
+<button id="start">
+START RUSH
+</button>
+
+</div>
+
+</div>
+
+
+<img id="target" src="Carmen.jpg">
+
+
+<div id="hitText">
++1
+</div>
+
+</div>
+
+
+<div class="controls" id="controls">
+</div>
+
+</div>
+
+
+<script>
+
+/* ==================================
+   MEMBERS
+================================== */
+
+const members=[
+  "Carmen",
+  "Jiwoo",
+  "Yuha",
+  "Stella",
+  "Juun",
+  "A-na",
+  "Ian",
+  "Ye-on"
+];
+
+
+const pictures=[
+  "Carmen.jpg",
+  "Jiwoo.jpg",
+  "Yuha.jpg",
+  "Stella.jpg",
+  "Juun.jpg",
+  "A-na.jpg",
+  "Ian.jpg",
+  "Ye-on.jpg"
+];
+
+
+/* ==================================
+   ELEMENTS
+================================== */
+
+const gameArea=
+document.getElementById("gameArea");
+
+const target=
+document.getElementById("target");
+
+const scoreText=
+document.getElementById("score");
+
+const comboText=
+document.getElementById("combo");
+
+const bestText=
+document.getElementById("best");
+
+const livesText=
+document.getElementById("lives");
+
+const overlay=
+document.getElementById("overlay");
+
+const startButton=
+document.getElementById("start");
+
+const fever=
+document.getElementById("fever");
+
+const hitText=
+document.getElementById("hitText");
+
+const controls=
+document.getElementById("controls");
+
+
+/* ==================================
+   GAME VARIABLES
+================================== */
+
+let score=0;
+
+let combo=0;
+
+let lives=3;
+
+let current=0;
+
+let running=false;
+
+let timeLimit=1300;
+
+let timer=null;
+
+let feverTimer=null;
+
+let best=
+Number(localStorage.getItem("h2hRushBest")) || 0;
+
+
+/* ==================================
+   SHOW BEST
+================================== */
+
+bestText.textContent=best;
+
+
+/* ==================================
+   CREATE MEMBER BUTTONS
+================================== */
+
+members.forEach((name,index)=>{
+
+  const button=
+  document.createElement("button");
+
+  button.className="memberBtn";
+
+  button.innerHTML=`
+    <img
+      src="${pictures[index]}"
+      alt="${name}"
+    >
+  `;
+
+  button.onclick=()=>{
+    choose(index);
+  };
+
+  controls.appendChild(button);
+
+});
+
+
+/* ==================================
+   SPEED LINES
+================================== */
+
+for(let i=0;i<25;i++){
+
+  const line=
+  document.createElement("div");
+
+  line.className="speedLine";
+
+  line.style.left=
+  Math.random()*100+"%";
+
+  line.style.animationDuration=
+  (Math.random()*1.5+.5)+"s";
+
+  line.style.animationDelay=
+  Math.random()*2+"s";
+
+  gameArea.appendChild(line);
+
+}
+
+
+/* ==================================
+   START GAME
+================================== */
+
+function startGame(){
+
+  score=0;
+
+  combo=0;
+
+  lives=3;
+
+  timeLimit=1300;
+
+  running=true;
+
+  fever.classList.remove("active");
+
+  overlay.classList.add("hidden");
+
+  updateStats();
+
+  nextTarget();
+
+}
+
+
+/* ==================================
+   NEXT TARGET
+================================== */
+
+function nextTarget(){
+
+  if(!running)return;
+
+
+  current=
+  Math.floor(
+    Math.random()*members.length
+  );
+
+
+  target.src=
+  pictures[current];
+
+
+  /* RANDOM POSITION */
+
+  const rect=
+  gameArea.getBoundingClientRect();
+
+  const targetSize=
+  target.offsetWidth;
+
+
+  const padding=targetSize/2+15;
+
+
+  const x=
+  padding+
+  Math.random()*
+  (rect.width-padding*2);
+
+
+  const y=
+  100+
+  Math.random()*
+  (rect.height-180);
+
+
+  target.style.left=
+  x+"px";
+
+  target.style.top=
+  y+"px";
+
+
+  target.classList.remove("pulse");
+
+  void target.offsetWidth;
+
+  target.classList.add("pulse");
+
+
+  /* TIME LIMIT */
+
+  clearTimeout(timer);
+
+  timer=
+  setTimeout(()=>{
+
+    if(!running)return;
+
+    wrong();
+
+  },timeLimit);
+
+}
+
+
+/* ==================================
+   PLAYER CHOICE
+================================== */
+
+function choose(index){
+
+  if(!running)return;
+
+
+  clearTimeout(timer);
+
+
+  if(index===current){
+
+    correct();
+
+  }else{
+
+    wrong();
+
+  }
+
+}
+
+
+/* ==================================
+   CORRECT
+================================== */
+
+function correct(){
+
+  score++;
+
+  combo++;
+
+
+  /* COMBO BONUS */
+
+  if(combo>1){
+
+    score+=
+    Math.floor(combo/5);
+
+  }
+
+
+  /* FASTER */
+
+  timeLimit=
+  Math.max(
+    350,
+    1300-
+    combo*25
+  );
+
+
+  /* FEVER */
+
+  if(combo>=20){
+
+    activateFever();
+
+  }
+
+
+  showHit();
+
+
+  updateStats();
+
+  nextTarget();
+
+}
+
+
+/* ==================================
+   WRONG
+================================== */
+
+function wrong(){
+
+  combo=0;
+
+  lives--;
+
+
+  updateStats();
+
+
+  if(lives<=0){
+
+    gameOver();
+
+    return;
+
+  }
+
+
+  /* SMALL PENALTY */
+
+  score=
+  Math.max(
+    0,
+    score-2
+  );
+
+
+  nextTarget();
+
+}
+
+
+/* ==================================
+   HIT EFFECT
+================================== */
+
+function showHit(){
+
+  hitText.textContent=
+  combo>=10
+  ? `+${combo}`
+  : "+1";
+
+
+  hitText.classList.remove("show");
+
+  void hitText.offsetWidth;
+
+  hitText.classList.add("show");
+
+}
+
+
+/* ==================================
+   FEVER MODE
+================================== */
+
+function activateFever(){
+
+  if(feverTimer)return;
+
+
+  fever.classList.add("active");
+
+
+  score+=5;
+
+
+  feverTimer=
+  setTimeout(()=>{
+
+    fever.classList.remove("active");
+
+    feverTimer=null;
+
+  },5000);
+
+}
+
+
+/* ==================================
+   STATS
+================================== */
+
+function updateStats(){
+
+  scoreText.textContent=score;
+
+  comboText.textContent=combo;
+
+  livesText.textContent=lives;
+
+  bestText.textContent=best;
+
+}
+
+
+/* ==================================
+   GAME OVER
+================================== */
+
+function gameOver(){
+
+  running=false;
+
+  clearTimeout(timer);
+
+
+  if(score>best){
+
+    best=score;
+
+    localStorage.setItem(
+      "h2hRushBest",
+      best
+    );
+
+  }
+
+
+  bestText.textContent=best;
+
+
+  overlay.innerHTML=`
+
+    <div class="overlayBox">
+
+      <h2>
+        💔 RUSH OVER
+      </h2>
+
+      <p>
+
+        Score:
+        <strong>${score}</strong>
+
+        <br><br>
+
+        Best:
+        <strong>${best}</strong>
+
+        <br><br>
+
+        ${score>=best
+          ? "🏆 NEW RECORD!"
+          : "⚡ Try to beat your record!"}
+
+      </p>
+
+      <button id="start">
+        PLAY AGAIN
+      </button>
+
+    </div>
+
+  `;
+
+
+  overlay.classList.remove("hidden");
+
+
+  document
+  .getElementById("start")
+  .onclick=startGame;
+
+}
+
+
+/* ==================================
+   KEYBOARD
+================================== */
+
+document.addEventListener(
+"keydown",
+event=>{
+
+  if(!running)return;
+
+
+  const number=
+  Number(event.key);
+
+
+  if(
+    number>=1 &&
+    number<=8
+  ){
+
+    choose(number-1);
+
+  }
+
+});
+
+
+/* ==================================
+   START
+================================== */
+
+startButton.onclick=startGame;
+
+</script>
+
+</body>
+</html>
