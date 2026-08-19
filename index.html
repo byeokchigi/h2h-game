@@ -138,7 +138,7 @@ function flip(card){
  if(first.dataset.name===second.dataset.name){
    first.classList.add("matched");second.classList.add("matched");pairs++;
    document.getElementById("pairs").textContent=pairs;first=second=null;
-   if(pairs===8){clearInterval(timer);setTimeout(()=>alert(`Ah talaga ba? 🩵 \n ${moves} moves in ${time} seconds.`),250)}
+   if(pairs===8){clearInterval(timer);setTimeout(()=>alert('Wow so cool 🩵 \n ${moves} moves in ${time} seconds.`),250)}
  }else{
    lock=true;setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first=second=null;lock=false},850);
  }
