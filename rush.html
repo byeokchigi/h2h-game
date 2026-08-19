@@ -74,8 +74,8 @@ h1{
 #gameArea{
   position:relative;
   width:100%;
-  height:min(72vh,500px);
-  min-height:430px;
+  height:min(58vh,500px);
+  min-height:360px;
 
   overflow:hidden;
 
@@ -343,31 +343,55 @@ button{
 }
 
 @media(max-width:600px){
+@media(max-width:600px){
+
+  .game{
+    padding:8px;
+  }
+
+  h1{
+    font-size:32px;
+  }
+
+  .subtitle{
+    font-size:14px;
+    margin-bottom:5px;
+  }
+
+  .stats{
+    gap:5px;
+    margin-bottom:6px;
+  }
+
+  .stat{
+    padding:5px 9px;
+    font-size:13px;
+  }
 
   #gameArea{
-    height:64vh;
-    min-height:400px;
+    height:55vh;
+    min-height:330px;
   }
 
   #target{
-    width:90px;
-    height:90px;
+    width:80px;
+    height:80px;
   }
 
   .controls{
+    display:grid;
     grid-template-columns:repeat(4, 1fr);
-    gap:8px;
+    gap:6px;
     width:100%;
+    margin:8px auto 0;
   }
 
   .memberBtn{
     width:100%;
     aspect-ratio:1 / 1;
-    border-width:3px;
+    border-width:2px;
   }
-
 }
-
 </style>
 </head>
 
