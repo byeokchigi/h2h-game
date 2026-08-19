@@ -14,11 +14,29 @@
 button#restart{display:block;margin:20px auto 0;border:0;padding:11px 22px;border-radius:999px;background:#49364f;color:#fff;font-weight:800;cursor:pointer}
 @media(max-width:600px){.board{gap:8px}.card{height:110px}.name{font-size:12px}.symbol{font-size:28px}}
 
+html, body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+.game-board {
+    width: 90%;
+    max-width: 700px;
+    margin: 20px auto;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+
+    box-sizing: border-box;
+}
 .card {
-  width: 150px;
-  height: 200px;
-  perspective: 1000px;
-  cursor: pointer;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    perspective: 1000px;
+    box-sizing: border-box;
 }
 
 .card .inner {
