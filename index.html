@@ -110,11 +110,17 @@ const icons=[
   
 let deck=[],first=null,second=null,lock=false,moves=0,pairs=0,time=0,timer;
 const board=document.getElementById("board");
+const bgMusic = new Audio("Iconic.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function start(){
  clearInterval(timer);moves=0;pairs=0;time=0;first=second=null;lock=false;
  document.getElementById("moves").textContent=0;document.getElementById("pairs").textContent=0;document.getElementById("time").textContent=0;
  deck=shuffle(members.flatMap((name,i)=>[{name,i},{name,i}]));
+bgMusic.play().catch(error => {
+    console.log("Music waiting for user interaction");
+});
  board.innerHTML="";
  deck.forEach((card,index)=>{
    const b=document.createElement("button");b.className="card";b.dataset.name=card.name;
@@ -142,6 +148,9 @@ function flip(card){
    if(pairs===8){
     clearInterval(timer);
 
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+
     const finishSound = new Audio("cool.mp3");
 
     finishSound.play();
@@ -149,7 +158,7 @@ function flip(card){
     finishSound.onended = () => {
         alert(`Wow so cool 🩵\n${moves} moves in ${time} seconds.`);
     };
-   }
+    }
 }else{
     lock=true;
     setTimeout(()=>{
