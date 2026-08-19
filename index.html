@@ -138,10 +138,32 @@ function flip(card){
  if(first.dataset.name===second.dataset.name){
    first.classList.add("matched");second.classList.add("matched");pairs++;
    document.getElementById("pairs").textContent=pairs;first=second=null;
-   if(pairs===8){clearInterval(timer);setTimeout(()=>alert('Wow so cool 🩵 \n ${moves} moves in ${time} seconds.`),250)}
- }else{
-   lock=true;setTimeout(()=>{first.classList.remove("flipped");second.classList.remove("flipped");first=second=null;lock=false},850);
- }
+   if(first.dataset.name===second.dataset.name){
+    first.classList.add("matched");
+    second.classList.add("matched");
+
+    document.getElementById("pairs").textContent=++pairs;
+
+    if(pairs===8){
+        clearInterval(timer);
+
+        const finishSound = new Audio("cool.mp3");
+        finishSound.play();
+
+        setTimeout(()=>{
+            alert(`Wow so cool 🩵\n${moves} moves in ${time} seconds.`);
+        },500);
+    }
+}else{
+    lock=true;
+    setTimeout(()=>{
+        first.classList.remove("flipped");
+        second.classList.remove("flipped");
+        first=null;
+        second=null;
+        lock=false;
+    },800);
+   }
 }
 document.getElementById("restart").onclick=start;start();
 </script>
