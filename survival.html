@@ -1,1 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+<title>Hearts2Hearts — Survival</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+  background:
+    radial-gradient(circle at top, #ffd9ef, transparent 40%),
+    linear-gradient(135deg, #21102c, #4d174c);
+  color: white;
+  overflow: hidden;
+}
+
+.game {
+  width: min(700px, 100vw);
+  margin: auto;
+  padding: 12px;
+  text-align: center;
+}
+
+h1 {
+  margin: 5px 0;
+  font-size: clamp(28px, 7vw, 48px);
+  background: linear-gradient(90deg,#ff76bd,#a887ff);
+  color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0 0 8px;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.stat {
+  background: #ffffff22;
+  border: 1px solid #ffffff30;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+#gameArea {
+  position: relative;
+  width: 100%;
+  height: min(70vh, 600px);
+  min-height: 450px;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 2px solid #ffffff55;
+  background:
+    linear-gradient(#250d38aa,#170b27dd),
+    radial-gradient(circle at 50% 20%, #8b4fa8, transparent 50%);
+  box-shadow: 0 0 35px #ff55bb33;
+}
+
+.star {
+  position: absolute;
+  color: #ffffff77;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  from { opacity:.2; }
+  to { opacity:1; }
+}
+
+#player {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  width: 75px;
+  height: 75px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 0 20px #ff8bd8;
+  object-fit: cover;
+  background: white;
+}
+
+.falling {
+  position: absolute;
+  top: -60px;
+  font-size: 36px;
+  user-select: none;
+}
+
+.good {
+  filter: drop-shadow(0 0 8px #ff8ed2);
+}
+
+.bad {
+  filter: drop-shadow(0 0 8px #ff4545);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 10px;
+}
+
+.control {
+  width: 90px;
+  height: 50px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff20;
+  color: white;
+  font-size: 25px;
+  font-weight: bold;
+  border: 1px solid #ffffff44;
+}
+
+.control:active {
+  transform: scale(.92);
+  background: #ff65b533;
+}
+
+button#start {
+  margin-top: 8px;
+  border: 0;
+  padding: 12px 25px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#ff55a9,#8064e8);
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+#message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #170b27cc;
+  font-size: 25px;
+  font-weight: 900;
+  padding: 30px;
+  z-index: 20;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#hearts {
+  letter-spacing: 3px;
+}
+
+@media(max-width:600px) {
+  #gameArea {
+    height: 65vh;
+    min-height: 400px;
+  }
+
+  #player {
+    width: 65px;
+    height: 65px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<h1>Hearts2Hearts 💗</h1>
+<p class="subtitle">SURVIVAL</p>
+
+<div class="stats">
+  <div class="stat">
+    Score: <span id="score">0</span>
+  </div>
+
+  <div class="stat">
+    High Score: <span id="highScore">0</span>
+  </div>
+
+  <div class="stat">
+    <span id="hearts">❤️❤️❤️</span>
+  </div>
+</div>
+
+<div id="gameArea">
+
+  <div id="message">
+    <div>
+      💗 SURVIVE! 💗
+      <br>
+      <small>
+        Collect 💗 and avoid 💔
+      </small>
+      <br>
+      <button id="start">START GAME</button>
+    </div>
+  </div>
+
+  <img id="player" src="Carmen.jpg">
+
+</div>
+
+<div class="controls">
+  <button class="control" id="left">⬅️</button>
+  <button class="control" id="right">➡️</button>
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   HEARTS2HEARTS MEMBERS
+========================= */
+
+const members = [
+  "Carmen",
+  "Jiwoo",
+  "Yuha",
+  "Stella",
+  "Juun",
+  "A-na",
+  "Ian",
+  "Ye-on"
+];
+
+const pictures = [
+  "Carmen.jpg",
+  "Jiwoo.jpg",
+  "Yuha.jpg",
+  "Stella.jpg",
+  "Juun.jpg",
+  "A-na.jpg",
+  "Ian.jpg",
+  "Ye-on.jpg"
+];
+
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+const gameArea = document.getElementById("gameArea");
+const player = document.getElementById("player");
+
+const scoreText = document.getElementById("score");
+const highScoreText = document.getElementById("highScore");
+const heartsText = document.getElementById("hearts");
+const message = document.getElementById("message");
+
+let score = 0;
+let lives = 3;
+
+let playerX = 50;
+
+let running = false;
+
+let objects = [];
+
+let spawnTimer;
+let gameLoop;
+
+let speed = 2.5;
+
+let highScore =
+  Number(localStorage.getItem("h2hHighScore")) || 0;
+
+highScoreText.textContent = highScore;
+
+
+/* =========================
+   RANDOM MEMBER
+========================= */
+
+function chooseMember() {
+
+  const random =
+    Math.floor(Math.random() * pictures.length);
+
+  player.src = pictures[random];
+}
+
+
+/* =========================
+   START
+========================= */
+
+function startGame() {
+
+  score = 0;
+  lives = 3;
+  speed = 2.5;
+
+  objects.forEach(o => o.element.remove());
+  objects = [];
+
+  updateStats();
+
+  chooseMember();
+
+  playerX = 50;
+
+  player.style.left = playerX + "%";
+
+  message.classList.add("hidden");
+
+  running = true;
+
+  clearInterval(spawnTimer);
+  cancelAnimationFrame(gameLoop);
+
+  spawnTimer =
+    setInterval(spawnObject, 650);
+
+  gameLoop =
+    requestAnimationFrame(update);
+}
+
+
+/* =========================
+   SPAWN OBJECT
+========================= */
+
+function spawnObject() {
+
+  if (!running) return;
+
+  const element =
+    document.createElement("div");
+
+  const good =
+    Math.random() < 0.7;
+
+  element.className =
+    "falling " + (good ? "good" : "bad");
+
+  element.textContent =
+    good ? "💗" : "💔";
+
+  const x =
+    Math.random() * 90 + 5;
+
+  element.style.left = x + "%";
+
+  gameArea.appendChild(element);
+
+  objects.push({
+    element: element,
+    x: x,
+    y: -50,
+    good: good
+  });
+}
+
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function update() {
+
+  if (!running) return;
+
+  const areaHeight =
+    gameArea.clientHeight;
+
+  const playerRect =
+    player.getBoundingClientRect();
+
+  objects.forEach((obj, index) => {
+
+    obj.y += speed;
+
+    obj.element.style.transform =
+      `translateY(${obj.y}px)`;
+
+    const objRect =
+      obj.element.getBoundingClientRect();
+
+    /*
+      COLLISION
+    */
+
+    if (
+      objRect.bottom >= playerRect.top &&
+      objRect.top <= playerRect.bottom &&
+      objRect.left < playerRect.right &&
+      objRect.right > playerRect.left
+    ) {
+
+      if (obj.good) {
+
+        score++;
+
+        /*
+          Every 10 points:
+          game gets faster
+        */
+
+        if (score % 10 === 0) {
+          speed += 0.4;
+        }
+
+      } else {
+
+        loseLife();
+
+      }
+
+      obj.element.remove();
+      objects.splice(index,1);
+
+      updateStats();
+
+      return;
+    }
+
+    /*
+      MISSED OBJECT
+    */
+
+    if (obj.y > areaHeight + 50) {
+
+      obj.element.remove();
+      objects.splice(index,1);
+    }
+
+  });
+
+  gameLoop =
+    requestAnimationFrame(update);
+}
+
+
+/* =========================
+   LOSE LIFE
+========================= */
+
+function loseLife() {
+
+  lives--;
+
+  updateStats();
+
+  if (lives <= 0) {
+    gameOver();
+  }
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+function updateStats() {
+
+  scoreText.textContent = score;
+
+  heartsText.textContent =
+    "❤️".repeat(lives) +
+    "🖤".repeat(3 - lives);
+}
+
+
+/* =========================
+   GAME OVER
+========================= */
+
+function gameOver() {
+
+  running = false;
+
+  clearInterval(spawnTimer);
+  cancelAnimationFrame(gameLoop);
+
+  if (score > highScore) {
+
+    highScore = score;
+
+    localStorage.setItem(
+      "h2hHighScore",
+      highScore
+    );
+
+    highScoreText.textContent =
+      highScore;
+  }
+
+  message.innerHTML = `
+    <div>
+      💔 GAME OVER 💔
+      <br><br>
+      Score: ${score}
+      <br>
+      High Score: ${highScore}
+      <br><br>
+      <button id="start">
+        PLAY AGAIN
+      </button>
+    </div>
+  `;
+
+  message.classList.remove("hidden");
+
+  document
+    .getElementById("start")
+    .onclick = startGame;
+}
+
+
+/* =========================
+   MOVEMENT
+========================= */
+
+function moveLeft() {
+
+  if (!running) return;
+
+  playerX -= 5;
+
+  if (playerX < 7)
+    playerX = 7;
+
+  player.style.left =
+    playerX + "%";
+}
+
+
+function moveRight() {
+
+  if (!running) return;
+
+  playerX += 5;
+
+  if (playerX > 93)
+    playerX = 93;
+
+  player.style.left =
+    playerX + "%";
+}
+
+
+/* =========================
+   KEYBOARD
+========================= */
+
+document.addEventListener(
+  "keydown",
+  e => {
+
+    if (e.key === "ArrowLeft")
+      moveLeft();
+
+    if (e.key === "ArrowRight")
+      moveRight();
+
+  }
+);
+
+
+/* =========================
+   PHONE CONTROLS
+========================= */
+
+document
+  .getElementById("left")
+  .addEventListener("touchstart", e => {
+    e.preventDefault();
+    moveLeft();
+  });
+
+document
+  .getElementById("right")
+  .addEventListener("touchstart", e => {
+    e.preventDefault();
+    moveRight();
+  });
+
+document
+  .getElementById("left")
+  .onclick = moveLeft;
+
+document
+  .getElementById("right")
+  .onclick = moveRight;
+
+
+/* =========================
+   START BUTTON
+========================= */
+
+document
+  .getElementById("start")
+  .onclick = startGame;
+
+</script>
+
+</body>
+</html>
