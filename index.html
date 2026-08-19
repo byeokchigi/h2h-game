@@ -139,16 +139,17 @@ function flip(card){
    first.classList.add("matched");second.classList.add("matched");pairs++;
    document.getElementById("pairs").textContent=pairs;first=second=null;
 
-    if(pairs===8){
-        clearInterval(timer);
+   if(pairs===8){
+    clearInterval(timer);
 
-        const finishSound = new Audio("cool.mp3");
-        finishSound.play();
+    const finishSound = new Audio("cool.mp3");
 
-        setTimeout(()=>{
-            alert(`Wow so cool 🩵\n${moves} moves in ${time} seconds.`);
-        },500);
-    }
+    finishSound.play();
+
+    finishSound.onended = () => {
+        alert(`Wow so cool 🩵\n${moves} moves in ${time} seconds.`);
+    };
+   }
 }else{
     lock=true;
     setTimeout(()=>{
