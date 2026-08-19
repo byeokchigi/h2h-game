@@ -301,16 +301,16 @@ button{
 /* CONTROLS */
 
 .controls{
-  display:flex;
-  justify-content:center;
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
   gap:10px;
-
-  margin-top:8px;
+  width:min(500px, 100%);
+  margin:12px auto 0;
 }
 
 .memberBtn{
-  width:300px;
-  height:200px;
+  width:100%;
+  aspect-ratio:1 / 1;
 
   padding:0;
 
@@ -318,13 +318,16 @@ button{
 
   overflow:hidden;
 
-  border:3px solid #ffffff55;
+  border:4px solid #ffffff55;
 
   background:#ffffff15;
 
   transition:
     transform .1s,
     border .1s;
+
+  box-shadow:
+    0 4px 15px #0005;
 }
 
 .memberBtn img{
@@ -351,10 +354,16 @@ button{
     height:90px;
   }
 
+  .controls{
+    grid-template-columns:repeat(4, 1fr);
+    gap:8px;
+    width:100%;
+  }
+
   .memberBtn{
-    width:70px;
-    height:70px;
-    border-width:2px;
+    width:100%;
+    aspect-ratio:1 / 1;
+    border-width:3px;
   }
 
 }
